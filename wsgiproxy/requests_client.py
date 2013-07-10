@@ -30,6 +30,11 @@ class HttpClient(object):
 
         location = response.headers.get('location') or None
         status = '%s %s' % (response.status_code, response.reason)
-        headers = [(k.title(), v) for k, v in response.headers.items()]
+
+        # For now, drop the Content-Length header since it's not right when we
+        # have gzip-encoded content.
+        headers = [(k.title(), v) for k, v in response.headers.items()
+                   if k.title() != 'Content-Length']
+
         return (status, location, headers,
                 response.iter_content(chunk_size=self.chunk_size))
